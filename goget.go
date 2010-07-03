@@ -1,19 +1,13 @@
 package main
 
 import (
-	"bytes"
+	"bufio"
 	"flag"
 	"fmt"
 	"http"
 	"io"
 	"os"
 )
-
-func ReaderToString(reader io.Reader) string {
-	buffer := bytes.NewBufferString("")
-	buffer.ReadFrom(reader)
-	return buffer.String()
-}
 
 func BuildAuthUrl(url string, username string, password string) (urlResult string, err os.Error) {
 	urlObj, err := http.ParseURL(url)
@@ -26,23 +20,20 @@ func BuildAuthUrl(url string, username string, password string) (urlResult strin
 	return
 }
 
-func FetchUrl(url string) (result string, err os.Error) {
+func FetchUrl(url string, outfile string) (err os.Error) {
 	r, _, err := http.Get(url)
 	if err != nil {
-		return "", err
+		return err
         }
-	result = ReaderToString(r.Body)
-	return 
-}
-
-func WriteOutData(data string, outfile string) (err os.Error) {
 	file, err := os.Open(outfile, os.O_WRONLY | os.O_CREAT, 0777)
 	if err != nil {
  		return err
 	}
-	file.WriteString(data)
+	io.Copy(bufio.NewWriter(file), r.Body)
+	r.Body.Close()
 	file.Close()
-	return 
+
+	return nil
 }
 
 var username = flag.String("username", "", "Username for auth.")
@@ -60,17 +51,12 @@ func main() {
 
 	authUrl, err := BuildAuthUrl(*url, *username, *password)
 	if err != nil {
-		fmt.Println("Error building auth url");
+		fmt.Println("Error building auth url: " + err.String());
 		os.Exit(1)
 	}
-	data, err := FetchUrl(authUrl)
+	err = FetchUrl(authUrl, *outfile)
 	if err != nil {
-		fmt.Println("Error fetching url");
+		fmt.Println("Error fetching url: " + err.String());
 		os.Exit(1)
 	}	
-	err = WriteOutData(data, *outfile)
-	if err != nil {
-		fmt.Println("Error writing out data: " + err.String());
-		os.Exit(1)
-	}
 }
