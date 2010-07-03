@@ -9,6 +9,10 @@ import (
 	"os"
 )
 
+const (
+	bufSize = 1024 * 8
+)
+
 func BuildAuthUrl(url string, username string, password string) (urlResult string, err os.Error) {
 	urlObj, err := http.ParseURL(url)
 	if err != nil {
@@ -29,7 +33,12 @@ func FetchUrl(url string, outfile string) (err os.Error) {
 	if err != nil {
  		return err
 	}
-	io.Copy(bufio.NewWriter(file), r.Body)
+	bufferedWriter, err := bufio.NewWriterSize(file, bufSize)
+	if err != nil {
+		return err
+	}
+
+	io.Copy(bufferedWriter, r.Body)
 	r.Body.Close()
 	file.Close()
 
