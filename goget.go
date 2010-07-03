@@ -1,16 +1,16 @@
-package main
+package goget
 
 import (
 	"bufio"
-	"flag"
-	"fmt"
 	"http"
 	"io"
+	"strings"
 	"os"
 )
 
 const (
 	bufSize = 1024 * 8
+	defaultFilename = "index.html"
 )
 
 func BuildAuthUrl(url string, username string, password string) (urlResult string, err os.Error) {
@@ -45,27 +45,23 @@ func FetchUrl(url string, outfile string) (err os.Error) {
 	return nil
 }
 
-var username = flag.String("username", "", "Username for auth.")
-var password = flag.String("password", "", "Password for auth.")
-var url = flag.String("url", "", "URL to fetch")
-var outfile = flag.String("o", "", "Where to save the file")
-
-func main() {
-	flag.Parse()
-
-	if *url == "" {
-		fmt.Println("Must specify url to fetch")
-		os.Exit(1)
-	}
-
-	authUrl, err := BuildAuthUrl(*url, *username, *password)
+func GetOutfile(url string) (outfile string, err os.Error) {
+	urlObj, err := http.ParseURL(url)
 	if err != nil {
-		fmt.Println("Error building auth url: " + err.String())
-		os.Exit(1)
+		return "", err
 	}
-	err = FetchUrl(authUrl, *outfile)
-	if err != nil {
-		fmt.Println("Error fetching url: " + err.String())
-		os.Exit(1)
+
+	path := urlObj.Path
+	slashIndex := strings.LastIndex(path, "/")
+	if slashIndex == -1 {
+		// no slash found, used a default filename
+		outfile = defaultFilename
+		return
 	}
+	slashIndex++
+	outfile = path[slashIndex:len(path)]
+	if outfile == "" {
+		outfile = defaultFilename
+	}
+	return
 }
