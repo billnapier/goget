@@ -28,10 +28,10 @@ func FetchUrl(url string, outfile string) (err os.Error) {
 	r, _, err := http.Get(url)
 	if err != nil {
 		return err
-        }
-	file, err := os.Open(outfile, os.O_WRONLY | os.O_CREAT, 0777)
+	}
+	file, err := os.Open(outfile, os.O_WRONLY|os.O_CREAT, 0777)
 	if err != nil {
- 		return err
+		return err
 	}
 	bufferedWriter, err := bufio.NewWriterSize(file, bufSize)
 	if err != nil {
@@ -60,12 +60,12 @@ func main() {
 
 	authUrl, err := BuildAuthUrl(*url, *username, *password)
 	if err != nil {
-		fmt.Println("Error building auth url: " + err.String());
+		fmt.Println("Error building auth url: " + err.String())
 		os.Exit(1)
 	}
 	err = FetchUrl(authUrl, *outfile)
 	if err != nil {
-		fmt.Println("Error fetching url: " + err.String());
+		fmt.Println("Error fetching url: " + err.String())
 		os.Exit(1)
-	}	
+	}
 }
