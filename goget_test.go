@@ -2,6 +2,7 @@ package goget_test
 
 import (
 	"goget"
+	"http"
 	"testing"
 )
 
@@ -47,3 +48,20 @@ func TestGetOutfileDefault2(t *testing.T) {
 	AssertEquals(t, "index.html", outfile)
 }
 
+func TestBuildAuthUrl(t *testing.T) {
+	url, err := goget.BuildAuthUrl("http://example.com", "user", "pass")
+	AssertNil(t, err)
+
+	urlObj, err := http.ParseURL(url)
+	AssertNil(t, err)
+	AssertEquals(t, "user:pass", urlObj.Userinfo)
+}
+
+func TestBuildAuthUrlNoAuth(t *testing.T) {
+	url, err := goget.BuildAuthUrl("http://example.com", "", "")
+	AssertNil(t, err)
+
+	urlObj, err := http.ParseURL(url)
+	AssertNil(t, err)
+	AssertEquals(t, "", urlObj.Userinfo)
+}

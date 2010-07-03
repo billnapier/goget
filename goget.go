@@ -18,6 +18,10 @@ func BuildAuthUrl(url string, username string, password string) (urlResult strin
 	if err != nil {
 		return "", err
 	}
+	if username == "" || password == "" {
+		urlResult = url
+		return
+	}
 	// Fill in the userinfo field
 	urlObj.Userinfo = username + ":" + password
 	urlResult = urlObj.String()

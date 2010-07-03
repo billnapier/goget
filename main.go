@@ -31,5 +31,6 @@ func main() {
 			fmt.Println("Error fetching url: " + err.String())
 			os.Exit(1)
 		}
+		fmt.Println("Downloaded to " + outfile)
 	}
 }

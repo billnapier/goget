@@ -15,7 +15,7 @@ GOTESTFILES=\
 	goget_test.go
 
 # build "main" executable
-main: package
+goget: package
 	$(GC) -I_obj main.go
 	$(LD) -L_obj -o $@ main.$O
 	@echo "Done. Executable is: $@"
