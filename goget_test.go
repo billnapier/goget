@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-type Object interface {}
+type Object interface{}
 
 type Stringer interface {
 	String() string

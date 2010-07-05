@@ -15,7 +15,7 @@ func GoGet(url string, resultChan chan string) {
 	if err != nil {
 		fmt.Println("Error determining outfile: " + err.String())
 		os.Exit(1)
-	}	
+	}
 
 	authUrl, err := goget.BuildAuthUrl(url, *username, *password)
 	if err != nil {
@@ -42,6 +42,6 @@ func main() {
 
 	// And wait for their completion
 	for i := 0; i < flag.NArg(); i++ {
-		fmt.Println("Downloaded to " + <- results)
+		fmt.Println("Downloaded to " + <-results)
 	}
 }

@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	bufSize = 1024 * 8
+	bufSize         = 1024 * 8
 	defaultFilename = "index.html"
 )
 
