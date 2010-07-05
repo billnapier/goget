@@ -10,11 +10,9 @@ import (
 var username = flag.String("username", "", "Username for auth.")
 var password = flag.String("password", "", "Password for auth.")
 
-func main() {
-	flag.Parse()
-
-	for i := 0; i < flag.NArg(); i++ {
-		url := flag.Arg(i)
+func GoGet(url string) chan string {
+	ch := make(chan string)
+	go func() {
 		outfile, err := goget.GetOutfile(url)
 		if err != nil {
 			fmt.Println("Error determining outfile: " + err.String())
@@ -31,6 +29,23 @@ func main() {
 			fmt.Println("Error fetching url: " + err.String())
 			os.Exit(1)
 		}
-		fmt.Println("Downloaded to " + outfile)
+		ch <- outfile
+	}()
+	return ch
+}
+
+func main() {
+	flag.Parse()
+
+	results := make([]chan string, flag.NArg())
+
+	// Kick off all the async downloads
+	for i := 0; i < flag.NArg(); i++ {
+		results[i] = GoGet(flag.Arg(i))
+	}
+
+	// And wait for their completion
+	for i := 0; i < flag.NArg(); i++ {
+		fmt.Println("Downloaded to " + <- results[i])
 	}
 }
